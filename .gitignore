@@ -1,3 +1,4 @@
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
@@ -16,6 +17,11 @@ DerivedData/
 *.perspectivev3
 !default.perspectivev3
 xcuserdata/
+*.xcworkspace
+UserInterfaceState.xcuserstate
+.DS_Store
+._.DS_Store
+.pyc
 
 ## Other
 *.moved-aside
@@ -52,7 +58,7 @@ Carthage/Build
 fastlane/report.xml
 fastlane/screenshots
 
-#Code Injection
+# Code Injection
 #
 # After new code Injection tools there's a generated folder /iOSInjectionProject
 # https://github.com/johnno1962/injectionforxcode
