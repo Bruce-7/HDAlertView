@@ -1,5 +1,5 @@
 //
-//  HDDefine.h
+//  HDMacro.h
 //  PortableTreasure
 //
 //  Created by HeDong on 15/03/20.
@@ -15,12 +15,6 @@
 //// iPhone Simulator
 //#endif
 
-#define dispatch_main_async_safe(block)             \
-if ([NSThread isMainThread]) {                      \
-block();                                            \
-} else {                                            \
-dispatch_async(dispatch_get_main_queue(), block);   \
-}
 
 #ifdef __cplusplus
 #define HD_EXTERN		extern "C" __attribute__((visibility ("default")))
@@ -28,19 +22,35 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 #define HD_EXTERN	        extern __attribute__((visibility ("default")))
 #endif
 
+
 #define weakSelf(weakSelf) __weak typeof(self)weakSelf = self;
 #define strongSelf(strongSelf) __strong typeof(weakSelf)strongSelf = weakSelf; if (!strongSelf) return;
+
 
 // 由角度获取弧度
 #define HDDegreesToRadian(x) (M_PI * (x) / 180.0)
 // 由弧度获取角度
 #define HDRadianToDegrees(radian) (radian * 180.0) / (M_PI)
 
+
 #define HDNotificationCenter [NSNotificationCenter defaultCenter]
 #define HDUserDefaults [NSUserDefaults standardUserDefaults]
 #define HDFirstWindow [UIApplication sharedApplication].windows.firstObject
 #define HDRootViewController HDFirstWindow.rootViewController
 
+
+/******* 效验对象是否是空 *******/
+#define HDStringIsEmpty(str) ([str isKindOfClass:[NSNull class]] || str == nil || [str length] < 1 ? YES : NO )
+#define HDArrayIsEmpty(array) (array == nil || [array isKindOfClass:[NSNull class]] || array.count == 0)
+#define HDDictionaryIsEmpty(dic) (dic == nil || [dic isKindOfClass:[NSNull class]] || dic.allKeys == 0)
+#define HDObjectIsEmpty(_object) (_object == nil \
+|| [_object isKindOfClass:[NSNull class]] \
+|| ([_object respondsToSelector:@selector(length)] && [(NSData *)_object length] == 0) \
+|| ([_object respondsToSelector:@selector(count)] && [(NSArray *)_object count] == 0))
+/******* 效验对象是否是空 *******/
+
+
+/******* APP_INFO *******/
 /** APP版本号 */
 #define HDAppVersion [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]
 /** APP BUILD 版本号 */
@@ -51,10 +61,32 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 #define HDLocalLanguage [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode]
 /** 当前国家 */
 #define HDLocalCountry [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode]
+/******* APP_INFO *******/
+
+
+/******* 回到主线程 *******/
+#define dispatch_main_sync_safe(block)\
+if ([NSThread isMainThread]) {\
+block();\
+} else {\
+dispatch_sync(dispatch_get_main_queue(), block);\
+}
+
+#define dispatch_main_async_safe(block)             \
+if ([NSThread isMainThread]) {                      \
+block();                                            \
+} else {                                            \
+dispatch_async(dispatch_get_main_queue(), block);   \
+}
+/******* 回到主线程 *******/
 
 
 /******* RGB颜色 *******/
-#define HDColor(r, g, b) [UIColor colorWithRed:(r) / 255.0 green:(g) / 255.0  blue:(b) / 255.0  alpha:1.0]
+#define HDColorAlpha(r, g, b, a) [UIColor colorWithRed:(r) / 255.0 green:(g) / 255.0  blue:(b) / 255.0  alpha:a]
+#define HDColor(r, g, b) HDColorAlpha(r, g, b, 1.0)
+
+#define HDColorFromHexAlpha(rgbValue, a) [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16)) / 255.0 green:((float)((rgbValue & 0xFF00) >> 8)) / 255.0 blue:((float)(rgbValue & 0xFF)) / 255.0 alpha:a]
+#define HDColorFromHex(rgbValue) HDColorFromHexAlpha(rgbValue, 1.0)
 /******* RGB颜色 *******/
 
 
@@ -73,11 +105,12 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 #define HDSYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define HDSYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
-#define iOS5_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")
-#define iOS6_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"6.0")
-#define iOS7_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0")
-#define iOS8_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")
-#define iOS9_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")
+#define iOS5_OR_LATER  HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"5.0")
+#define iOS6_OR_LATER  HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"6.0")
+#define iOS7_OR_LATER  HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0")
+#define iOS8_OR_LATER  HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0")
+#define iOS9_OR_LATER  HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")
+#define iOS10_OR_LATER HDSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"10.0")
 
 /** 系统和版本号 */
 #define HDDevice [UIDevice currentDevice]
@@ -94,10 +127,11 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 #define HDiPad (HDDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad)
 /******* 设备型号和系统 *******/
 
-///******* 日志打印替换 *******/
+
+/******* 日志打印替换 *******/
 //#import <CocoaLumberjack/CocoaLumberjack.h>
-//#ifdef DEBUG
-//
+#ifdef DEBUG
+
 //#define HDLog(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, 0, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)
 //
 //#define HDLogError(frmt, ...)   LOG_MAYBE(NO,                LOG_LEVEL_DEF, DDLogFlagError,   0, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)
@@ -109,25 +143,27 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 //#define HDLogDebug(frmt, ...)   LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagDebug,   0, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)
 //
 //#define HDLogVerbose(frmt, ...) LOG_MAYBE(LOG_ASYNC_ENABLED, LOG_LEVEL_DEF, DDLogFlagVerbose, 0, nil, __PRETTY_FUNCTION__, frmt, ##__VA_ARGS__)
-//
-//
-//#define HDAssert(...) NSAssert(__VA_ARGS__)
-//
+
+
+#define HDAssert(...) NSAssert(__VA_ARGS__)
+#define HDParameterAssert(condition) NSAssert((condition), @"Invalid parameter not satisfying: %@", @#condition)
+
 //static const int ddLogLevel = LOG_LEVEL_VERBOSE;
-//
-//#else
-//
+
+#else
+
 //#define HDLog(...)  
 //#define HDLogError(frmt, ...)
 //#define HDLogWarn(frmt, ...)
 //#define HDLogInfo(frmt, ...)
 //#define HDLogDebug(frmt, ...)
-//
-//#define HDAssert(...)
-//static const int ddLogLevel = LOG_LEVEL_OFF;
-//
-//#endif
-///******* 日志打印替换 *******/
+
+#define HDAssert(...)
+#define HDParameterAssert(condition)
+static const int ddLogLevel = LOG_LEVEL_OFF;
+
+#endif
+/******* 日志打印替换 *******/
 
 
 /******* 归档解档 *******/

@@ -16,7 +16,7 @@ HD_EXTERN NSString *const HDAlertViewDidDismissNotification;
 
 typedef NS_ENUM(NSInteger, HDAlertViewStyle) {
     HDAlertViewStyleAlert = 0,  // 默认
-    HDAlertViewStyleActionSheet // 暂未实现(有空再编写Frame)
+    HDAlertViewStyleActionSheet
 };
 
 typedef NS_ENUM(NSInteger, HDAlertViewButtonType) {
