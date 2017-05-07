@@ -52,7 +52,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     if (self = [super initWithFrame:frame]) {
         self.style = style;
         self.opaque = NO;
-        self.windowLevel = 1999.0; // 不重叠系统的Alert, Alert的层级.
+        self.windowLevel = 1899.0; // 不重叠系统的Alert, Alert的层级.
     }
     
     return self;
@@ -89,18 +89,22 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 
 #pragma mark - HDAlertView
-@interface HDAlertView ()
+@interface HDAlertView () <CAAnimationDelegate>
 
 /** 是否动画 */
 @property (nonatomic, assign, getter = isAlertAnimating) BOOL alertAnimating;
 /** 是否可见 */
 @property (nonatomic, assign, getter = isVisible) BOOL visible;
+/** 图片 */
+@property (nonatomic, weak) UIImageView *imageView;
 /** 标题 */
 @property (nonatomic, weak) UILabel *titleLabel;
 /** 消息描述 */
 @property (nonatomic, weak) UILabel *messageLabel;
 /** 容器视图 */
 @property (nonatomic, weak) UIView *containerView;
+/** 毛玻璃视图 */
+@property (nonatomic, weak) UIVisualEffectView *effectView;
 /** 存放行动items */
 @property (nonatomic, strong) NSMutableArray *items;
 /** 存放按钮 */
@@ -117,7 +121,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     if (self != [HDAlertView class]) return;
     
     HDAlertView *appearance = [self appearance]; // 设置整体默认外观
-    appearance.viewBackgroundColor = [UIColor whiteColor];
+    appearance.viewBackgroundColor = [UIColor clearColor];
     appearance.titleColor = [UIColor blackColor];
     appearance.messageColor = [UIColor darkGrayColor];
     appearance.titleFont = [UIFont boldSystemFontOfSize:18.0];
@@ -399,90 +403,173 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 #pragma mark - 布局
 - (void)setSubviewsFrame {
-    CGFloat margin = 20.0;
-    
-    CGFloat horizontalMargin = 25.0;
-    // 真机才有效,模拟器统一是25.0
-    if ([[NSString hd_deviceType] isEqualToString:iPhone6]) {
-        horizontalMargin = 45.0;
-    }
-    
-    if ([[NSString hd_deviceType] isEqualToString:iPhone6Plus]) {
-        horizontalMargin = 60.0;
-    }
-    
-    CGFloat containerViewW = (HDMainScreenWidth - horizontalMargin * 2);
-    
-    /** 标题 */
-    CGSize titleLabelSize = {0, 0};
-    if (self.title.length > 0) {
-        titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
-    }
-    
-    CGFloat titleLabelH = titleLabelSize.height;
-    CGFloat titleLabelW = containerViewW;
-    CGFloat titleLabelX = 0;
-    CGFloat titleLabelY = margin;
-    self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelW, titleLabelH);
-    
-    /** 消息描述 */
-    CGSize messageLabelSize = {0, 0};
-    if (self.message.length > 0) {
-        messageLabelSize = [self.message hd_sizeWithSystemFont:self.messageLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
-    }
-    
-    CGFloat messageLabelH = messageLabelSize.height;
-    CGFloat messageLabelW = containerViewW;
-    CGFloat messageLabelX = 0;
-    CGFloat messageLabelY = CGRectGetMaxY(self.titleLabel.frame) + margin;
-    self.messageLabel.frame = CGRectMake(messageLabelX, messageLabelY, messageLabelW, messageLabelH);
-    
-    /** 按钮 */
-    CGFloat buttonH = 44.0;
-    CGFloat buttonY = CGRectGetMaxY(self.messageLabel.frame) + margin;
-    
-    if (self.items.count > 0) {
+    if (self.alertViewStyle == HDAlertViewStyleActionSheet) {
+        CGFloat containerViewW = HDMainScreenWidth;
+        CGFloat margin = 25.0;
         
-        UIColor *btnColor = HDColor(225, 225, 225);
-        if (self.items.count == 2 && self.buttonsListStyle == HDAlertViewButtonsListStyleNormal) {
-            CGFloat buttonW = containerViewW * 0.5;
-            CGFloat buttonX = 0;
+        /** 标题 */
+        CGSize titleLabelSize = {0, 0};
+        if (self.title.length > 0) {
+            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+        }
+        
+//        CGFloat titleLabelH = titleLabelSize.height;
+        CGFloat titleLabelH = 64.0;
+        CGFloat titleLabelW = containerViewW - margin * 2;
+        CGFloat titleLabelX = margin;
+        CGFloat titleLabelY = 0;
+        self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelW, titleLabelH);
+        self.titleLabel.numberOfLines = 2;
+        
+        /** 按钮 */
+        CGFloat buttonH = 50.0;
+        CGFloat buttonY = 0;
+        CGFloat lineY = 0;
+        CGFloat lineH = 0.5;
+        
+        if (self.title.length > 0) {
+            buttonY = CGRectGetMaxY(self.titleLabel.frame);
+        }
+        
+        if (self.items.count > 0) {
+            UIColor *lineColor = [HDColorFromHex(0xe5e5e5) colorWithAlphaComponent:0.8];
+            NSUInteger btnCount = self.buttons.count;
             
-            UIButton *button = self.buttons[0];
-            button.frame = CGRectMake(buttonX, buttonY, buttonW, buttonH);
+            if (self.title.length > 0) {
+                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
+                horizontalLine.backgroundColor = lineColor;
+                [self.containerView addSubview:horizontalLine];
+            }
             
-            button = self.buttons[1];
-            button.frame = CGRectMake(buttonW, buttonY, buttonW, buttonH);
-            
-            UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 1.0)];
-            horizontalLine.backgroundColor = btnColor;
-            [self.containerView addSubview:horizontalLine];
-            
-            UIView *verticaleLine = [[UIView alloc] initWithFrame:CGRectMake(buttonW, buttonY, 1.0, buttonH)];
-            verticaleLine.backgroundColor = btnColor;
-            [self.containerView addSubview:verticaleLine];
-            
-        } else {
-            for (NSUInteger i = 0; i < self.buttons.count; i++) {
+            for (NSUInteger i = 0; i < btnCount; i++) {
                 if (i > 0) {
                     buttonY += buttonH;
+                    lineY = buttonY;
                 }
                 
                 UIButton *button = self.buttons[i];
+                if (i == btnCount - 1) {
+                    buttonY = buttonY + 6;
+                    lineH = 6;
+                }
+                
                 button.frame = CGRectMake(0, buttonY, containerViewW, buttonH);
                 
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 1.0)];
-                horizontalLine.backgroundColor = btnColor;
+                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
+                horizontalLine.backgroundColor = lineColor;
                 [self.containerView addSubview:horizontalLine];
             }
         }
+        
+        /** 容器视图 */
+        CGFloat containerViewH = buttonY + buttonH;
+        CGFloat containerViewX = 0;
+        CGFloat containerViewY = self.hd_height - containerViewH;
+        self.containerView.frame = CGRectMake(containerViewX, containerViewY, containerViewW, containerViewH);
+        
+    } else {
+        CGFloat margin = 25.0;
+        
+        CGFloat horizontalMargin = 25.0;
+        // 真机才有效,模拟器统一是25.0
+        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7]) {
+            horizontalMargin = 45.0;
+        }
+        
+        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7Plus]) {
+            horizontalMargin = 60.0;
+        }
+        
+        CGFloat containerViewW = (HDMainScreenWidth - horizontalMargin * 2);
+        
+        /** 图片 */
+        if (self.imageName.length > 0) {
+            CGFloat imageViewH = 60;
+            CGFloat imageViewW = imageViewH;
+            CGFloat imageViewX = (containerViewW - imageViewW) * 0.5;
+            CGFloat imageViewY = margin;
+            
+            self.imageView.frame = CGRectMake(imageViewX, imageViewY, imageViewW, imageViewH);
+        }
+        
+        /** 标题 */
+        CGSize titleLabelSize = {0, 0};
+        if (self.title.length > 0) {
+            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+        }
+        
+        CGFloat titleLabelH = titleLabelSize.height;
+        CGFloat titleLabelW = containerViewW - margin * 2;
+        CGFloat titleLabelX = margin;
+        CGFloat titleLabelY = CGRectGetMaxY(self.imageView.frame) + margin;
+        self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelW, titleLabelH);
+        
+        /** 消息描述 */
+        CGSize messageLabelSize = {0, 0};
+        if (self.message.length > 0) {
+            messageLabelSize = [self.message hd_sizeWithSystemFont:self.messageLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+        }
+        
+        CGFloat messageLabelH = messageLabelSize.height;
+        CGFloat messageLabelW = titleLabelW;
+        CGFloat messageLabelX = titleLabelX;
+        CGFloat messageLabelY = 0;
+        if (self.title.length > 0) {
+            messageLabelY = CGRectGetMaxY(self.titleLabel.frame) + (messageLabelH > 0 ? margin : 0);
+        } else {
+            messageLabelY = messageLabelH > 0 ? margin : 0;
+        }
+        self.messageLabel.frame = CGRectMake(messageLabelX, messageLabelY, messageLabelW, messageLabelH);
+        
+        /** 按钮 */
+        CGFloat buttonH = 44.0;
+        CGFloat buttonY = CGRectGetMaxY(self.messageLabel.frame) + margin;
+        
+        if (self.items.count > 0) {
+            UIColor *lineColor = [HDColorFromHex(0xe5e5e5) colorWithAlphaComponent:0.8];
+            
+            if (self.items.count == 2 && self.buttonsListStyle == HDAlertViewButtonsListStyleNormal) {
+                CGFloat buttonW = containerViewW * 0.5;
+                CGFloat buttonX = 0;
+                
+                UIButton *button = self.buttons[0];
+                button.frame = CGRectMake(buttonX, buttonY, buttonW, buttonH);
+                
+                button = self.buttons[1];
+                button.frame = CGRectMake(buttonW, buttonY, buttonW, buttonH);
+                
+                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 0.5)];
+                horizontalLine.backgroundColor = lineColor;
+                [self.containerView addSubview:horizontalLine];
+                
+                UIView *verticaleLine = [[UIView alloc] initWithFrame:CGRectMake(buttonW, buttonY, 0.5, buttonH)];
+                verticaleLine.backgroundColor = lineColor;
+                [self.containerView addSubview:verticaleLine];
+                
+            } else {
+                for (NSUInteger i = 0; i < self.buttons.count; i++) {
+                    if (i > 0) {
+                        buttonY += buttonH;
+                    }
+                    
+                    UIButton *button = self.buttons[i];
+                    button.frame = CGRectMake(0, buttonY, containerViewW, buttonH);
+                    
+                    UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 0.5)];
+                    horizontalLine.backgroundColor = lineColor;
+                    [self.containerView addSubview:horizontalLine];
+                }
+            }
+        }
+        
+        /** 容器视图 */
+        CGFloat containerViewH = buttonY + buttonH;
+        CGFloat containerViewX = horizontalMargin;
+        CGFloat containerViewY = (self.hd_height - containerViewH) * 0.5;
+        self.containerView.frame = CGRectMake(containerViewX, containerViewY, containerViewW, containerViewH);
     }
     
-    /** 容器视图 */
-    CGFloat containerViewH = buttonY + buttonH;
-    CGFloat containerViewX = horizontalMargin;
-    CGFloat containerViewY = (self.hd_height - containerViewH) * 0.5;
-    self.containerView.frame = CGRectMake(containerViewX, containerViewY, containerViewW, containerViewH);
+    self.effectView.frame = self.containerView.bounds;
 }
 
 
@@ -490,12 +577,24 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 - (void)setUpSubviews {
     /** 容器视图 */
     UIView *containerView = [[UIView alloc] init];
-    containerView.backgroundColor = [UIColor whiteColor];
+    containerView.backgroundColor = [UIColor clearColor];
     containerView.layer.cornerRadius = self.cornerRadius;
     containerView.layer.masksToBounds = YES;
     [containerView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panPressContainerView:)]];
     [self addSubview:containerView];
     self.containerView = containerView;
+    
+    /** 毛玻璃视图 */
+    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blur];
+    effectView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];
+    [self.containerView addSubview:effectView];
+    self.effectView = effectView;
+    
+    /** 图片 */
+    UIImageView *imageView = [[UIImageView alloc] init];
+    [self.containerView addSubview:imageView];
+    self.imageView = imageView;
     
     /** 标题 */
     UILabel *titleLabel = [[UILabel alloc] init];
@@ -503,6 +602,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     titleLabel.backgroundColor = [UIColor clearColor];
     titleLabel.font = self.titleFont;
     titleLabel.textColor = self.titleColor;
+    titleLabel.numberOfLines = 0;
     [self.containerView addSubview:titleLabel];
     self.titleLabel = titleLabel;
     
@@ -592,8 +692,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     button.titleLabel.font = self.buttonFont;
     button.adjustsImageWhenHighlighted = NO;
     [button setTitle:item.title forState:UIControlStateNormal];
-    [button setBackgroundImage:[UIImage hd_imageWithColor:[UIColor whiteColor]] forState:UIControlStateNormal];
-    [button setBackgroundImage:[UIImage hd_imageWithColor:HDColor(230, 230, 230)] forState:UIControlStateHighlighted];
+    [button setBackgroundImage:[UIImage hd_imageWithColor:[UIColor clearColor]] forState:UIControlStateNormal];
+    [button setBackgroundImage:[UIImage hd_imageWithColor:[HDColor(230, 230, 230) colorWithAlphaComponent:0.5]] forState:UIControlStateHighlighted];
     
     switch (item.type) {
         case HDAlertViewButtonTypeCancel: {
@@ -621,9 +721,6 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     return button;
 }
 
-/**
- *  移除视图
- */
 - (void)removeView {
     self.alertWindow.alpha = 0;
     [self.alertWindow removeFromSuperview];
@@ -659,6 +756,13 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 
 #pragma mark - setter方法
+- (void)setImageName:(NSString *)imageName {
+    if (_imageName == imageName) return;
+    
+    _imageName = imageName;
+    [self.imageView setImage:[UIImage imageNamed:imageName]];
+}
+
 - (void)setTitle:(NSString *)title {
     if (_title == title) return;
     
@@ -781,6 +885,51 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             [button setTitleColor:[color colorWithAlphaComponent:0.2] forState:UIControlStateHighlighted];
         }
     }
+}
+
+
+#pragma mark - 类方法
++ (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block {
+    
+    HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:message];
+    alertView.cancelButtonTitleColor = [UIColor blackColor];
+    alertView.defaultButtonTitleColor = HDColorFromHex(0x0093ff);
+    
+    if (!HDStringIsEmpty(cancelButtonTitle)) {
+        [alertView addButtonWithTitle:cancelButtonTitle type:HDAlertViewButtonTypeCancel handler:^(HDAlertView *alertView) {
+            if (block) {
+                block(alertView, 0);
+            }
+        }];
+    }
+    
+    for (int i = 0; i < otherButtonTitles.count; i++) {
+        [alertView addButtonWithTitle:otherButtonTitles[i] type:HDAlertViewButtonTypeDefault handler:^(HDAlertView *alertView) {
+            if (block) {
+                if (!HDStringIsEmpty(cancelButtonTitle)) {
+                    block(alertView, i + 1);
+                }
+                
+                block(alertView, i);
+            }
+        }];
+    }
+    
+    [alertView show];
+    
+    return alertView;
+}
+
++ (HDAlertView *)showActionSheetWithTitle:(NSString *)title {
+    HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:nil];
+    alertView.alertViewStyle = HDAlertViewStyleActionSheet;
+    alertView.titleFont = [UIFont systemFontOfSize:13.0];
+    alertView.buttonFont = [UIFont systemFontOfSize:17.0];
+    alertView.cancelButtonTitleColor = HDColorFromHex(0xf74c31);
+    alertView.defaultButtonTitleColor = [UIColor blackColor];
+    alertView.titleColor = HDColorFromHex(0x999999);
+    
+    return alertView;
 }
 
 @end

@@ -13,10 +13,10 @@
 		6702F4E21D77C06000EAA8FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6702F4E01D77C06000EAA8FA /* Main.storyboard */; };
 		6702F4E41D77C06000EAA8FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6702F4E31D77C06000EAA8FA /* Assets.xcassets */; };
 		6702F4E71D77C06000EAA8FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6702F4E51D77C06000EAA8FA /* LaunchScreen.storyboard */; };
-		6702F4F91D77D97600EAA8FA /* HDAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6702F4F81D77D97600EAA8FA /* HDAlertView.m */; };
 		6702F4FD1D77DA1600EAA8FA /* UIView+HDExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 6702F4FC1D77DA1600EAA8FA /* UIView+HDExtension.m */; };
 		6702F5001D77DA2000EAA8FA /* UIImage+HDExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 6702F4FF1D77DA2000EAA8FA /* UIImage+HDExtension.m */; };
-		6702F5031D77DA2A00EAA8FA /* NSString+HDExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 6702F5021D77DA2A00EAA8FA /* NSString+HDExtension.m */; };
+		67EB57431EBF73DE00FBF3A3 /* NSString+HDExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 67EB57421EBF73DE00FBF3A3 /* NSString+HDExtension.m */; };
+		67EB57461EBF73EE00FBF3A3 /* HDAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 67EB57451EBF73EE00FBF3A3 /* HDAlertView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,15 +30,15 @@
 		6702F4E31D77C06000EAA8FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6702F4E61D77C06000EAA8FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6702F4E81D77C06100EAA8FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6702F4F71D77D97600EAA8FA /* HDAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDAlertView.h; sourceTree = "<group>"; };
-		6702F4F81D77D97600EAA8FA /* HDAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDAlertView.m; sourceTree = "<group>"; };
-		6702F4FA1D77D99200EAA8FA /* HDDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDDefine.h; sourceTree = "<group>"; };
 		6702F4FB1D77DA1600EAA8FA /* UIView+HDExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+HDExtension.h"; sourceTree = "<group>"; };
 		6702F4FC1D77DA1600EAA8FA /* UIView+HDExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+HDExtension.m"; sourceTree = "<group>"; };
 		6702F4FE1D77DA2000EAA8FA /* UIImage+HDExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+HDExtension.h"; sourceTree = "<group>"; };
 		6702F4FF1D77DA2000EAA8FA /* UIImage+HDExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+HDExtension.m"; sourceTree = "<group>"; };
-		6702F5011D77DA2A00EAA8FA /* NSString+HDExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HDExtension.h"; sourceTree = "<group>"; };
-		6702F5021D77DA2A00EAA8FA /* NSString+HDExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HDExtension.m"; sourceTree = "<group>"; };
+		67EB57401EBF73C600FBF3A3 /* HDMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDMacro.h; sourceTree = "<group>"; };
+		67EB57411EBF73DE00FBF3A3 /* NSString+HDExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+HDExtension.h"; sourceTree = "<group>"; };
+		67EB57421EBF73DE00FBF3A3 /* NSString+HDExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+HDExtension.m"; sourceTree = "<group>"; };
+		67EB57441EBF73EE00FBF3A3 /* HDAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDAlertView.h; sourceTree = "<group>"; };
+		67EB57451EBF73EE00FBF3A3 /* HDAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDAlertView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,15 +96,15 @@
 		6702F4EE1D77C2BA00EAA8FA /* HDAlertView */ = {
 			isa = PBXGroup;
 			children = (
-				6702F4FA1D77D99200EAA8FA /* HDDefine.h */,
-				6702F4F71D77D97600EAA8FA /* HDAlertView.h */,
-				6702F4F81D77D97600EAA8FA /* HDAlertView.m */,
+				67EB57441EBF73EE00FBF3A3 /* HDAlertView.h */,
+				67EB57451EBF73EE00FBF3A3 /* HDAlertView.m */,
+				67EB57411EBF73DE00FBF3A3 /* NSString+HDExtension.h */,
+				67EB57421EBF73DE00FBF3A3 /* NSString+HDExtension.m */,
+				67EB57401EBF73C600FBF3A3 /* HDMacro.h */,
 				6702F4FB1D77DA1600EAA8FA /* UIView+HDExtension.h */,
 				6702F4FC1D77DA1600EAA8FA /* UIView+HDExtension.m */,
 				6702F4FE1D77DA2000EAA8FA /* UIImage+HDExtension.h */,
 				6702F4FF1D77DA2000EAA8FA /* UIImage+HDExtension.m */,
-				6702F5011D77DA2A00EAA8FA /* NSString+HDExtension.h */,
-				6702F5021D77DA2A00EAA8FA /* NSString+HDExtension.m */,
 			);
 			path = HDAlertView;
 			sourceTree = "<group>";
@@ -181,12 +181,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6702F4DF1D77C06000EAA8FA /* ViewController.m in Sources */,
+				67EB57431EBF73DE00FBF3A3 /* NSString+HDExtension.m in Sources */,
+				67EB57461EBF73EE00FBF3A3 /* HDAlertView.m in Sources */,
 				6702F5001D77DA2000EAA8FA /* UIImage+HDExtension.m in Sources */,
 				6702F4DC1D77C06000EAA8FA /* AppDelegate.m in Sources */,
 				6702F4FD1D77DA1600EAA8FA /* UIView+HDExtension.m in Sources */,
 				6702F4D91D77C06000EAA8FA /* main.m in Sources */,
-				6702F4F91D77D97600EAA8FA /* HDAlertView.m in Sources */,
-				6702F5031D77DA2A00EAA8FA /* NSString+HDExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

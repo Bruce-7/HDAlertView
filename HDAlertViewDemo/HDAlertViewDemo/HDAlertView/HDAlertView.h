@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "HDDefine.h"
+#import "HDMacro.h"
 
 HD_EXTERN NSString *const HDAlertViewWillShowNotification;
 HD_EXTERN NSString *const HDAlertViewDidShowNotification;
@@ -47,6 +47,9 @@ typedef NS_ENUM(NSInteger, HDAlertViewTransitionStyle) {
 typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 
 @interface HDAlertView : UIView
+
+/** 图标的名字 */
+@property (nonatomic, copy) NSString *imageName;
 
 /** 标题-只支持1行 */
 @property (nonatomic, copy) NSString *title;
@@ -110,6 +113,31 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
  *  显示弹窗提示
  */
 - (void)show;
+
+/**
+ *  移除视图
+ */
+- (void)removeView;
+
+/**
+ 快速弹窗
+ 
+ @param title 标题
+ @param message 消息体
+ @param cancelButtonTitle 取消按钮文字
+ @param otherButtonTitles 其他按钮
+ @param block 回调
+ @return 返回HDAlertView对象
+ */
++ (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block;
+
+/**
+ ActionSheet样式弹窗
+ 
+ @param title 标题
+ @return 返回HBAlertView对象
+ */
++ (HDAlertView *)showActionSheetWithTitle:(NSString *)title;
 
 @end
 

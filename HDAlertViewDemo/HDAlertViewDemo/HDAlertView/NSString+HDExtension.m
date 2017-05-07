@@ -282,10 +282,23 @@
     
     NSDictionary *attributes = @{NSFontAttributeName : font,
                                  NSParagraphStyleAttributeName : paragraphStyle};
+    CGRect rect = [self boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+    return CGSizeMake(ceil(rect.size.width), ceil(rect.size.height));
+}
+
+- (CGSize)hd_sizeWithSystemFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(NSLineBreakMode)mode numberOfLine:(NSInteger)numberOfLine {
+    CGSize maxSize = [self hd_sizeWithSystemFont:font constrainedToSize:size lineBreakMode:mode];
+    CGFloat oneLineHeight = [self hd_sizeWithSystemFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat height = 0;
+    CGFloat limitHeight = oneLineHeight * numberOfLine;
     
-    CGRect bounds = [self boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+    if (maxSize.height > limitHeight) {
+        height = limitHeight;
+    } else {
+        height = maxSize.height;
+    }
     
-    return CGSizeMake(ceil(bounds.size.width), ceil(bounds.size.height));
+    return CGSizeMake(maxSize.width, height);
 }
 
 - (CGSize)hd_sizeWithSystemFont:(UIFont *)font constrainedToSize:(CGSize)size {
@@ -296,26 +309,98 @@
     return [text hd_sizeWithSystemFont:font constrainedToSize:size];
 }
 
+- (CGSize)hd_sizeWithBoldFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(NSLineBreakMode)mode {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineBreakMode = mode;
+    paragraphStyle.alignment = NSTextAlignmentLeft;
+    NSDictionary *attributes = @{NSFontAttributeName: font,
+                                 NSParagraphStyleAttributeName: paragraphStyle};
 
-#pragma mark - 其他
-/**
- *  返回二进制 Bytes 流的字符串表示形式
- *
- *  @param bytes  二进制 Bytes 数组
- *  @param length 数组长度
- *
- *  @return 字符串表示形式
- */
-- (instancetype)hd_stringFromBytes:(uint8_t *)bytes length:(int)length {
-    NSMutableString *strM = [NSMutableString string];
-    
-    for (int i = 0; i < length; i++) {
-        [strM appendFormat:@"%02x", bytes[i]];
-    }
-    
-    return [strM copy];
+    CGRect rect = [self boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+    return CGSizeMake(ceil(rect.size.width), ceil(rect.size.height));
 }
 
+- (CGSize)hd_sizeWithBoldFont:(UIFont *)font constrainedToSize:(CGSize)size {
+    return [self hd_sizeWithBoldFont:font constrainedToSize:size lineBreakMode:NSLineBreakByWordWrapping];
+}
+
+- (CGSize)hd_sizeWithBoldFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(NSLineBreakMode)mode numberOfLine:(NSInteger)numberOfLine {
+    CGSize maxSize = [self hd_sizeWithBoldFont:font constrainedToSize:size lineBreakMode:mode];
+    CGFloat oneLineHeight = [self hd_sizeWithBoldFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat height = 0;
+    CGFloat limitHeight = oneLineHeight * numberOfLine;
+    
+    if (maxSize.height > limitHeight) {
+        height = limitHeight;
+    } else {
+        height = maxSize.height;
+    }
+    
+    return CGSizeMake(maxSize.width, height);
+}
+
+
+#pragma mark - 富文本相关
+- (NSAttributedString *)hd_conversionToAttributedStringWithLineSpeace:(CGFloat)lineSpacing kern:(CGFloat)kern lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineSpacing = lineSpacing;
+    paragraphStyle.lineBreakMode = lineBreakMode;
+    paragraphStyle.alignment = alignment;
+    
+    NSDictionary *attributes = @{NSParagraphStyleAttributeName:paragraphStyle,
+                                 NSKernAttributeName:@(kern)};
+    
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:self attributes:attributes];
+    
+    return attributedString;
+}
+
+- (CGSize)hd_sizeWithAttributedStringLineSpeace:(CGFloat)lineSpeace kern:(CGFloat)kern font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment {
+    if (font == nil) {
+        HDAssert(!HDObjectIsEmpty(font), @"font不能为空");
+        return CGSizeMake(0, 0);
+    }
+    
+    NSMutableParagraphStyle *paraStyle = [[NSMutableParagraphStyle alloc] init];
+    paraStyle.lineSpacing = lineSpeace;
+    paraStyle.lineBreakMode = lineBreakMode;
+    paraStyle.alignment = alignment;
+    
+    NSDictionary *dic = @{NSFontAttributeName:font,
+                          NSParagraphStyleAttributeName:paraStyle,
+                          NSKernAttributeName:@(kern)};
+    CGRect rect = [self boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin attributes:dic context:nil];
+    return CGSizeMake(ceil(rect.size.width), ceil(rect.size.height));
+}
+
+- (CGSize)hd_sizeWithAttributedStringLineSpeace:(CGFloat)lineSpeace kern:(CGFloat)kern font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment numberOfLine:(NSInteger)numberOfLine {
+    CGSize maxSize = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:lineBreakMode alignment:alignment];
+    CGFloat oneLineHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height;
+    CGFloat height = 0;
+    CGFloat limitHeight = oneLineHeight * numberOfLine;
+    
+    if (maxSize.height > limitHeight) {
+        height = limitHeight;
+    } else {
+        height = maxSize.height;
+    }
+    
+    return CGSizeMake(maxSize.width, height);
+}
+
+- (BOOL)hd_numberOfLineWithLineSpeace:(CGFloat)lineSpeace kern:(CGFloat)kern font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment {
+    CGFloat oneHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat maxHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:lineBreakMode alignment:alignment].height;
+    
+    if (maxHeight > oneHeight) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+
+#pragma mark - 设备相关
 /**
  *  设备版本
  */
@@ -342,6 +427,10 @@
     if ([deviceString isEqualToString:@"iPhone7,2"])    return @"iPhone 6";
     if ([deviceString isEqualToString:@"iPhone8,1"])    return @"iPhone 6s";
     if ([deviceString isEqualToString:@"iPhone8,2"])    return @"iPhone 6s Plus";
+    if ([deviceString isEqualToString:@"iPhone9,1"])    return @"iPhone 7";
+    if ([deviceString isEqualToString:@"iPhone9,2"])    return @"iPhone 7 Plus";
+    if ([deviceString isEqualToString:@"iPhone9,3"])    return @"iPhone 7";
+    if ([deviceString isEqualToString:@"iPhone9,4"])    return @"iPhone 7 Plus";
     
     // iPod
     if ([deviceString isEqualToString:@"iPod1,1"])      return @"iPod Touch 1G";
@@ -387,8 +476,8 @@
 }
 
 
-NSString *const iPhone6 = @"iPhone6";
-NSString *const iPhone6Plus = @"iPhone6Plus";
+NSString *const iPhone6_6s_7 = @"iPhone6_6s_7";
+NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
 
 + (instancetype)hd_deviceType {
     struct utsname systemInfo;
@@ -396,14 +485,20 @@ NSString *const iPhone6Plus = @"iPhone6Plus";
     NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
     
     // iPhone
-    if ([deviceString isEqualToString:@"iPhone7,1"])    return iPhone6Plus;
-    if ([deviceString isEqualToString:@"iPhone7,2"])    return iPhone6;
-    if ([deviceString isEqualToString:@"iPhone8,1"])    return iPhone6;
-    if ([deviceString isEqualToString:@"iPhone8,2"])    return iPhone6Plus;
+    if ([deviceString isEqualToString:@"iPhone7,1"])    return iPhone6_6s_7Plus;
+    if ([deviceString isEqualToString:@"iPhone7,2"])    return iPhone6_6s_7;
+    if ([deviceString isEqualToString:@"iPhone8,1"])    return iPhone6_6s_7;
+    if ([deviceString isEqualToString:@"iPhone8,2"])    return iPhone6_6s_7Plus;
+    if ([deviceString isEqualToString:@"iPhone9,1"])    return iPhone6_6s_7;
+    if ([deviceString isEqualToString:@"iPhone9,2"])    return iPhone6_6s_7Plus;
+    if ([deviceString isEqualToString:@"iPhone9,3"])    return iPhone6_6s_7;
+    if ([deviceString isEqualToString:@"iPhone9,4"])    return iPhone6_6s_7Plus;
     
     return deviceString;
 }
 
+
+#pragma mark - 效验相关
 - (BOOL)hd_isValidEmail {
     NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
@@ -419,14 +514,11 @@ NSString *const iPhone6Plus = @"iPhone6Plus";
 }
 
 - (BOOL)hd_isValidUrl {
-    NSString *regex = @"(http|https)://((\\w)*|([0-9]*)|([-|_])*)+([\\.|/]((\\w)*|([0-9]*)|([-|_])*))+";
+    NSString *regex = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z0-9]{1,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#;$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^;&*+?:_/=<>]*)?)";
     NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     return [urlTest evaluateWithObject:self];
 }
 
-/**
- * 验证是否是手机号
- */
 - (BOOL)hd_isValidateMobile {
     if (self.length < 1) {
         return NO;
@@ -476,6 +568,76 @@ NSString *const iPhone6Plus = @"iPhone6Plus";
 //    } else {
 //        return NO;
 //    }
+}
+
+
+#pragma mark - 限制相关
+- (instancetype)hd_limitLength:(NSInteger)length {
+    NSString *str = self;
+    if (str.length > length) {
+        str = [str substringToIndex:length];
+    }
+    
+    return str;
+}
+
+- (NSUInteger)hd_length {
+    float number = 0.0;
+    
+    for (int i = 0; i < self.length; i++) {
+        NSString *character = [self substringWithRange:NSMakeRange(i, 1)];
+        
+        if ([character lengthOfBytesUsingEncoding:NSUTF8StringEncoding] == 3) {
+            number++;
+        } else {
+            number = number + 0.5;
+        }
+    }
+    
+    return ceil(number);
+}
+
+- (instancetype)hd_substringMaxLength:(NSUInteger)maxLength {
+    NSMutableString *ret = [[NSMutableString alloc] init];
+    float number = 0.0;
+    
+    for (int i = 0; i < self.length; i++) {
+        NSString *character = [self substringWithRange:NSMakeRange(i, 1)];
+        
+        if ([character lengthOfBytesUsingEncoding:NSUTF8StringEncoding] == 3) {
+            number++;
+        } else {
+            number = number + 0.5;
+        }
+        
+        if (number <= maxLength) {
+            [ret appendString:character];
+        } else {
+            break;
+        }
+    }
+    
+    return [ret copy];
+}
+
+
+#pragma mark - 其他
+/**
+ *  返回二进制 Bytes 流的字符串表示形式
+ *
+ *  @param bytes  二进制 Bytes 数组
+ *  @param length 数组长度
+ *
+ *  @return 字符串表示形式
+ */
+- (instancetype)hd_stringFromBytes:(uint8_t *)bytes length:(int)length {
+    NSMutableString *strM = [NSMutableString string];
+    
+    for (int i = 0; i < length; i++) {
+        [strM appendFormat:@"%02x", bytes[i]];
+    }
+    
+    return [strM copy];
 }
 
 @end
