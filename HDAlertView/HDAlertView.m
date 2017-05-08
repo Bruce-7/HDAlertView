@@ -409,13 +409,14 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         
         /** 标题 */
         CGSize titleLabelSize = {0, 0};
+        CGFloat titleLabelW = containerViewW - margin * 2;
+        
         if (self.title.length > 0) {
-            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(titleLabelW, MAXFLOAT)];
         }
         
 //        CGFloat titleLabelH = titleLabelSize.height;
         CGFloat titleLabelH = 64.0;
-        CGFloat titleLabelW = containerViewW - margin * 2;
         CGFloat titleLabelX = margin;
         CGFloat titleLabelY = 0;
         self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelW, titleLabelH);
@@ -494,24 +495,26 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         
         /** 标题 */
         CGSize titleLabelSize = {0, 0};
+        CGFloat titleLabelW = containerViewW - margin * 2;
+        
         if (self.title.length > 0) {
-            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+            titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(titleLabelW, MAXFLOAT)];
         }
         
         CGFloat titleLabelH = titleLabelSize.height;
-        CGFloat titleLabelW = containerViewW - margin * 2;
         CGFloat titleLabelX = margin;
         CGFloat titleLabelY = CGRectGetMaxY(self.imageView.frame) + margin;
         self.titleLabel.frame = CGRectMake(titleLabelX, titleLabelY, titleLabelW, titleLabelH);
         
         /** 消息描述 */
         CGSize messageLabelSize = {0, 0};
+        CGFloat messageLabelW = titleLabelW;
+        
         if (self.message.length > 0) {
-            messageLabelSize = [self.message hd_sizeWithSystemFont:self.messageLabel.font constrainedToSize:CGSizeMake(containerViewW, MAXFLOAT)];
+            messageLabelSize = [self.message hd_sizeWithSystemFont:self.messageLabel.font constrainedToSize:CGSizeMake(messageLabelW, MAXFLOAT)];
         }
         
         CGFloat messageLabelH = messageLabelSize.height;
-        CGFloat messageLabelW = titleLabelW;
         CGFloat messageLabelX = titleLabelX;
         CGFloat messageLabelY = 0;
         if (self.title.length > 0) {
