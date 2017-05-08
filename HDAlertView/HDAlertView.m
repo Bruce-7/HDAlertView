@@ -415,7 +415,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             titleLabelSize = [self.title hd_sizeWithSystemFont:self.titleLabel.font constrainedToSize:CGSizeMake(titleLabelW, MAXFLOAT)];
         }
         
-//        CGFloat titleLabelH = titleLabelSize.height;
+        //        CGFloat titleLabelH = titleLabelSize.height;
         CGFloat titleLabelH = 64.0;
         CGFloat titleLabelX = margin;
         CGFloat titleLabelY = 0;
