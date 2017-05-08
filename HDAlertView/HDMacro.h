@@ -160,7 +160,7 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 
 #define HDAssert(...)
 #define HDParameterAssert(condition)
-static const int ddLogLevel = LOG_LEVEL_OFF;
+//static const int ddLogLevel = LOG_LEVEL_OFF;
 
 #endif
 /******* 日志打印替换 *******/
