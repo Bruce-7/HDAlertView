@@ -117,7 +117,7 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 /**
  *  移除视图
  */
-- (void)removeView;
+- (void)removeAlertView;
 
 /**
  快速弹窗
@@ -140,9 +140,3 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 + (HDAlertView *)showActionSheetWithTitle:(NSString *)title;
 
 @end
-
-
-
-
-
-

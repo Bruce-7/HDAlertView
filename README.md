@@ -1,6 +1,6 @@
 # HDAlertView
 
-HDAlertView是一个类似系统alertView弹窗.
+HDAlertView是一个类似系统, 微信, QQ, 等等App的alertView弹窗.
 ### Demo【演示】
 ![演示](https://github.com/Bruce-7/HDAlertView/blob/master/Images/HDAlertViewDemo.gif)
 

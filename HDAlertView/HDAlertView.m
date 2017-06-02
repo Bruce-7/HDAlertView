@@ -77,7 +77,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         }
             
         case HDAlertViewBackgroundStyleSolid: {
-            [[UIColor colorWithWhite:0 alpha:0.1] set];
+            [[[UIColor blackColor] colorWithAlphaComponent:0.2] set];
             CGContextFillRect(context, self.bounds);
             break;
         }
@@ -97,6 +97,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 @property (nonatomic, assign, getter = isVisible) BOOL visible;
 /** 图片 */
 @property (nonatomic, weak) UIImageView *imageView;
+/** Label容器视图 */
+@property (nonatomic, weak) UIView *containerLabelView;
 /** 标题 */
 @property (nonatomic, weak) UILabel *titleLabel;
 /** 消息描述 */
@@ -194,6 +196,10 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     }];
 }
 
+- (void)removeAlertView {
+    [self dismissAnimated:YES];
+}
+
 - (void)dismissAnimated:(BOOL)animated {
     [self dismissAnimated:animated cleanup:YES];
 }
@@ -246,11 +252,17 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
  *  进入的动画
  */
 - (void)transitionInCompletion:(void(^)(void))completion {
+    CGFloat duration = 0.3;
+    
+    [UIView animateWithDuration:duration animations:^{
+        self.alertWindow.alpha = 1.0;
+    }];
+    
     switch (self.transitionStyle) {
         case HDAlertViewTransitionStyleFade: {
             self.containerView.alpha = 0;
             
-            [UIView animateWithDuration:0.3 animations:^{
+            [UIView animateWithDuration:duration animations:^{
                 self.containerView.alpha = 1;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -266,7 +278,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             rect.origin.y = -rect.size.height;
             self.containerView.frame = rect;
             
-            [UIView animateWithDuration:0.3 animations:^{
+            [UIView animateWithDuration:duration animations:^{
                 self.containerView.frame = originalRect;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -282,7 +294,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             rect.origin.y = self.hd_height;
             self.containerView.frame = rect;
             
-            [UIView animateWithDuration:0.3 animations:^{
+            [UIView animateWithDuration:duration animations:^{
                 self.containerView.frame = originalRect;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -297,7 +309,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             animation.values = @[@(0.01), @(1.2), @(0.9), @(1)];
             animation.keyTimes = @[@(0), @(0.4), @(0.6), @(1)];
             animation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
-            animation.duration = 0.5;
+            animation.duration = duration;
             animation.delegate = self;
             [animation setValue:completion forKey:@"handler"];
             [self.containerView.layer addAnimation:animation forKey:@"bouce"];
@@ -310,7 +322,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             animation.values = @[@(y - self.bounds.size.height), @(y + 20), @(y - 10), @(y)];
             animation.keyTimes = @[@(0), @(0.5), @(0.75), @(1)];
             animation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
-            animation.duration = 0.4;
+            animation.duration = duration;
             animation.delegate = self;
             [animation setValue:completion forKey:@"handler"];
             [self.containerView.layer addAnimation:animation forKey:@"dropdown"];
@@ -326,12 +338,14 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
  *  消失的动画
  */
 - (void)transitionOutCompletion:(void(^)(void))completion {
+    CGFloat duration = 0.3;
+    
     switch (self.transitionStyle) {
         case HDAlertViewTransitionStyleSlideFromBottom: {
             CGRect rect = self.containerView.frame;
             rect.origin.y = self.hd_height;
             
-            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
                 self.containerView.frame = rect;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -345,7 +359,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             CGRect rect = self.containerView.frame;
             rect.origin.y = -rect.size.height;
             
-            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
                 self.containerView.frame = rect;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -356,7 +370,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         }
             
         case HDAlertViewTransitionStyleFade: {
-            [UIView animateWithDuration:0.25 animations:^{
+            [UIView animateWithDuration:duration animations:^{
                 self.containerView.alpha = 0;
             } completion:^(BOOL finished) {
                 if (completion) {
@@ -371,7 +385,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             animation.values = @[@(1), @(1.2), @(0.01)];
             animation.keyTimes = @[@(0), @(0.4), @(1)];
             animation.timingFunctions = @[[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut], [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
-            animation.duration = 0.35;
+            animation.duration = duration;
             animation.delegate = self;
             [animation setValue:completion forKey:@"handler"];
             [self.containerView.layer addAnimation:animation forKey:@"bounce"];
@@ -383,7 +397,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         case HDAlertViewTransitionStyleDropDown: {
             CGPoint point = self.containerView.center;
             point.y += self.hd_height;
-            [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
                 self.containerView.center = point;
                 CGFloat angle = ((CGFloat)arc4random_uniform(100) - 50.f) / 100.f;
                 self.containerView.transform = CGAffineTransformMakeRotation(angle);
@@ -429,24 +443,23 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         CGFloat lineH = 0.5;
         
         if (self.title.length > 0) {
-            buttonY = CGRectGetMaxY(self.titleLabel.frame);
+            lineY = CGRectGetMaxY(self.titleLabel.frame);
+            buttonY = lineY + lineH;
         }
         
         if (self.items.count > 0) {
-            UIColor *lineColor = [HDColorFromHex(0xe5e5e5) colorWithAlphaComponent:0.8];
+            UIColor *lineColor = [UIColor clearColor]; // 保留线避免设计移除毛玻璃效果好设置颜色
             NSUInteger btnCount = self.buttons.count;
-            
-            if (self.title.length > 0) {
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
-                horizontalLine.backgroundColor = lineColor;
-                [self.containerView addSubview:horizontalLine];
-            }
             
             for (NSUInteger i = 0; i < btnCount; i++) {
                 if (i > 0) {
-                    buttonY += buttonH;
+                    buttonY += buttonH + lineH;
                     lineY = buttonY;
                 }
+                
+                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
+                horizontalLine.backgroundColor = lineColor;
+                [self.containerView addSubview:horizontalLine];
                 
                 UIButton *button = self.buttons[i];
                 if (i == btnCount - 1) {
@@ -455,12 +468,15 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
                 }
                 
                 button.frame = CGRectMake(0, buttonY, containerViewW, buttonH);
-                
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
-                horizontalLine.backgroundColor = lineColor;
-                [self.containerView addSubview:horizontalLine];
             }
         }
+        
+        /** Label容器视图 */
+        CGFloat containerLabelViewW = containerViewW;
+        CGFloat containerLabelViewH = CGRectGetMaxY(self.titleLabel.frame);
+        CGFloat containerLabelViewX = 0;
+        CGFloat containerLabelViewY = 0;
+        self.containerLabelView.frame = CGRectMake(containerLabelViewX, containerLabelViewY, containerLabelViewW, containerLabelViewH);
         
         /** 容器视图 */
         CGFloat containerViewH = buttonY + buttonH;
@@ -472,7 +488,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         CGFloat margin = 25.0;
         
         CGFloat horizontalMargin = 25.0;
-        // 真机才有效,模拟器统一是25.0
+        // 真机才有效,模拟器统一是25.0 // 或者按设计比例来不用这种方式!
         if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7]) {
             horizontalMargin = 45.0;
         }
@@ -525,45 +541,55 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         self.messageLabel.frame = CGRectMake(messageLabelX, messageLabelY, messageLabelW, messageLabelH);
         
         /** 按钮 */
+        CGFloat lineY = CGRectGetMaxY(self.messageLabel.frame) + margin;
+        CGFloat lineH = 0.5;
         CGFloat buttonH = 44.0;
-        CGFloat buttonY = CGRectGetMaxY(self.messageLabel.frame) + margin;
+        CGFloat buttonY = lineY + lineH;
         
         if (self.items.count > 0) {
-            UIColor *lineColor = [HDColorFromHex(0xe5e5e5) colorWithAlphaComponent:0.8];
+            UIColor *lineColor = [UIColor clearColor]; // 保留线避免设计移除毛玻璃效果好设置颜色
             
             if (self.items.count == 2 && self.buttonsListStyle == HDAlertViewButtonsListStyleNormal) {
                 CGFloat buttonW = containerViewW * 0.5;
                 CGFloat buttonX = 0;
                 
-                UIButton *button = self.buttons[0];
-                button.frame = CGRectMake(buttonX, buttonY, buttonW, buttonH);
-                
-                button = self.buttons[1];
-                button.frame = CGRectMake(buttonW, buttonY, buttonW, buttonH);
-                
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 0.5)];
+                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
                 horizontalLine.backgroundColor = lineColor;
                 [self.containerView addSubview:horizontalLine];
                 
-                UIView *verticaleLine = [[UIView alloc] initWithFrame:CGRectMake(buttonW, buttonY, 0.5, buttonH)];
+                UIButton *button = self.buttons[0];
+                button.frame = CGRectMake(buttonX, buttonY, buttonW, buttonH);
+                
+                UIView *verticaleLine = [[UIView alloc] initWithFrame:CGRectMake(buttonW, buttonY, lineH, buttonH)];
                 verticaleLine.backgroundColor = lineColor;
                 [self.containerView addSubview:verticaleLine];
+                
+                button = self.buttons[1];
+                button.frame = CGRectMake(buttonW + lineH, buttonY, buttonW - lineH, buttonH);
                 
             } else {
                 for (NSUInteger i = 0; i < self.buttons.count; i++) {
                     if (i > 0) {
-                        buttonY += buttonH;
+                        buttonY += buttonH + lineH;
+                        lineY = buttonY;
                     }
+                    
+                    UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
+                    horizontalLine.backgroundColor = lineColor;
+                    [self.containerView addSubview:horizontalLine];
                     
                     UIButton *button = self.buttons[i];
                     button.frame = CGRectMake(0, buttonY, containerViewW, buttonH);
-                    
-                    UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, buttonY, containerViewW, 0.5)];
-                    horizontalLine.backgroundColor = lineColor;
-                    [self.containerView addSubview:horizontalLine];
                 }
             }
         }
+        
+        /** Label容器视图 */
+        CGFloat containerLabelViewW = containerViewW;
+        CGFloat containerLabelViewH = CGRectGetMaxY(self.messageLabel.frame) + margin;
+        CGFloat containerLabelViewX = 0;
+        CGFloat containerLabelViewY = 0;
+        self.containerLabelView.frame = CGRectMake(containerLabelViewX, containerLabelViewY, containerLabelViewW, containerLabelViewH);
         
         /** 容器视图 */
         CGFloat containerViewH = buttonY + buttonH;
@@ -588,9 +614,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     self.containerView = containerView;
     
     /** 毛玻璃视图 */
-    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIBlurEffect *blur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleExtraLight];
     UIVisualEffectView *effectView = [[UIVisualEffectView alloc] initWithEffect:blur];
-    effectView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];
     [self.containerView addSubview:effectView];
     self.effectView = effectView;
     
@@ -599,6 +624,12 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     [self.containerView addSubview:imageView];
     self.imageView = imageView;
     
+    /** Label容器视图 */
+    UIView *containerLabelView = [[UIView alloc] init];
+    containerLabelView.backgroundColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];;
+    [containerView addSubview:containerLabelView];
+    self.containerLabelView = containerLabelView;
+    
     /** 标题 */
     UILabel *titleLabel = [[UILabel alloc] init];
     titleLabel.textAlignment = NSTextAlignmentCenter;
@@ -606,7 +637,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     titleLabel.font = self.titleFont;
     titleLabel.textColor = self.titleColor;
     titleLabel.numberOfLines = 0;
-    [self.containerView addSubview:titleLabel];
+    [self.containerLabelView addSubview:titleLabel];
     self.titleLabel = titleLabel;
     
     /** 消息描述 */
@@ -616,7 +647,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     messageLabel.font = self.messageFont;
     messageLabel.textColor = self.messageColor;
     messageLabel.numberOfLines = 0;
-    [self.containerView addSubview:messageLabel];
+    [self.containerLabelView addSubview:messageLabel];
     self.messageLabel = messageLabel;
 }
 
@@ -669,10 +700,16 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 - (HDAlertWindow *)alertWindow {
     if (!_alertWindow) {
         _alertWindow = [[HDAlertWindow alloc] initWithFrame:HDMainScreenBounds andStyle:self.backgroundStyle];
-        _alertWindow.alpha = 1.0;
+        UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onAlertWindow)];
+        [_alertWindow addGestureRecognizer:tapGes];
+        _alertWindow.alpha = 0.01;
     }
     
     return _alertWindow;
+}
+
+- (void)onAlertWindow {
+    [self dismissAnimated:YES];
 }
 
 /**
@@ -695,7 +732,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     button.titleLabel.font = self.buttonFont;
     button.adjustsImageWhenHighlighted = NO;
     [button setTitle:item.title forState:UIControlStateNormal];
-    [button setBackgroundImage:[UIImage hd_imageWithColor:[UIColor clearColor]] forState:UIControlStateNormal];
+    [button setBackgroundImage:[UIImage hd_imageWithColor:[[UIColor whiteColor] colorWithAlphaComponent:0.8]] forState:UIControlStateNormal];
     [button setBackgroundImage:[UIImage hd_imageWithColor:[HDColor(230, 230, 230) colorWithAlphaComponent:0.5]] forState:UIControlStateHighlighted];
     
     switch (item.type) {
@@ -725,13 +762,16 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 }
 
 - (void)removeView {
-    self.alertWindow.alpha = 0;
-    [self.alertWindow removeFromSuperview];
-    self.alertWindow = nil;
-    [self hd_removeAllSubviews];
-    [self removeFromSuperview];
-    
-    [HDFirstWindow makeKeyAndVisible];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.alertWindow.alpha = 0.01;
+    } completion:^(BOOL finished) {
+        [self.alertWindow removeFromSuperview];
+        self.alertWindow = nil;
+        [self hd_removeAllSubviews];
+        [self removeFromSuperview];
+        
+        [HDFirstWindow makeKeyAndVisible];
+    }];
 }
 
 
@@ -897,6 +937,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:message];
     alertView.cancelButtonTitleColor = [UIColor blackColor];
     alertView.defaultButtonTitleColor = HDColorFromHex(0x0093ff);
+    alertView.destructiveButtonTitleColor = HDColorFromHex(0xf74c31);
+    alertView.buttonFont = [UIFont systemFontOfSize:17.0];
     
     if (!HDStringIsEmpty(cancelButtonTitle)) {
         [alertView addButtonWithTitle:cancelButtonTitle type:HDAlertViewButtonTypeCancel handler:^(HDAlertView *alertView) {
@@ -926,11 +968,14 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 + (HDAlertView *)showActionSheetWithTitle:(NSString *)title {
     HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:nil];
     alertView.alertViewStyle = HDAlertViewStyleActionSheet;
+    alertView.transitionStyle = HDAlertViewTransitionStyleSlideFromBottom;
     alertView.titleFont = [UIFont systemFontOfSize:13.0];
     alertView.buttonFont = [UIFont systemFontOfSize:17.0];
     alertView.cancelButtonTitleColor = HDColorFromHex(0xf74c31);
     alertView.defaultButtonTitleColor = [UIColor blackColor];
+    alertView.destructiveButtonTitleColor = HDColorFromHex(0xf74c31);
     alertView.titleColor = HDColorFromHex(0x999999);
+    alertView.cornerRadius = 0;
     
     return alertView;
 }

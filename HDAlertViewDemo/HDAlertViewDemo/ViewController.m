@@ -24,6 +24,29 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    HDAlertView *alertView = [HDAlertView showActionSheetWithTitle:@"是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX"];
+
+    [alertView addButtonWithTitle:@"退出" type:HDAlertViewButtonTypeCancel handler:^(HDAlertView *alertView) {
+
+    }];
+
+    [alertView addButtonWithTitle:@"确定" type:HDAlertViewButtonTypeDefault handler:^(HDAlertView *alertView) {
+
+    }];
+
+    [alertView addButtonWithTitle:@"好的" type:HDAlertViewButtonTypeDefault handler:^(HDAlertView *alertView) {
+
+    }];
+
+    [alertView show];
+
+    
+    [HDAlertView showAlertViewWithTitle:nil message:@"是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX是否退出XXX" cancelButtonTitle:@"取消" otherButtonTitles:@[@"好的", @"好的", @"好的"] handler:^(HDAlertView *alertView, NSInteger buttonIndex) {
+        
+    }];
+}
+
 - (IBAction)styleOne {
     HDAlertView *alertView = [HDAlertView alertViewWithTitle:@"样式1" andMessage:@"~\(≧▽≦)/~啦啦啦"];
     
