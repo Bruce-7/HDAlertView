@@ -36,6 +36,42 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 @end
 
 
+#pragma mark - HDAlertViewController
+@interface HDAlertViewController : UIViewController
+
+@property (nonatomic, assign) BOOL allowRotation;
+
+@end
+
+
+@implementation HDAlertViewController
+
+- (instancetype)initWithAllowRotation:(BOOL)allowRotation {
+    if (self = [super init]) {
+        self.allowRotation = allowRotation;
+    }
+    
+    return self;
+}
+
+- (BOOL)shouldAutorotate {
+    return self.allowRotation;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    if (self.allowRotation) {
+        return UIInterfaceOrientationMaskAll;
+    }
+    
+    return UIInterfaceOrientationMaskPortrait;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    return UIInterfaceOrientationPortrait;
+}
+
+@end
+
 
 #pragma mark - HDAlertWindow
 @interface HDAlertWindow : UIWindow
@@ -144,6 +180,19 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     return self;
 }
 
+- (void)dealloc {
+    [HDNotificationCenter removeObserver:self];
+}
+
+- (void)supportRotating {
+    [HDNotificationCenter addObserver:self selector:@selector(statusBarOrientationChange:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+}
+
+- (void)statusBarOrientationChange:(NSNotification *)notification {
+    self.frame = HDMainScreenBounds;
+    [self setSubviewsFrame];
+}
+
 + (instancetype)alertViewWithTitle:(NSString *)title andMessage:(NSString *)message {
     return [[self alloc] initWithTitle:title andMessage:message];
 }
@@ -182,7 +231,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     self.alertAnimating = YES;
     
     [self setupButtons]; // 设置按钮
-    [self.alertWindow addSubview:self];
+    [self.alertWindow.rootViewController.view addSubview:self];
     [self.alertWindow makeKeyAndVisible];
     [self setSubviewsFrame]; // 布局
     
@@ -194,6 +243,10 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         
         weakSelf.alertAnimating = NO;
     }];
+    
+    if (self.isSupportRotating) {
+        [self supportRotating];
+    }
 }
 
 - (void)removeAlertView {
@@ -487,15 +540,16 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     } else {
         CGFloat margin = 25.0;
         
-        CGFloat horizontalMargin = 25.0;
+//        CGFloat horizontalMargin = 25.0;
         // 真机才有效,模拟器统一是25.0 // 或者按设计比例来不用这种方式!
-        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7]) {
-            horizontalMargin = 45.0;
-        }
-        
-        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7Plus]) {
-            horizontalMargin = 60.0;
-        }
+//        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7]) {
+//            horizontalMargin = 45.0;
+//        }
+//        
+//        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7Plus]) {
+//            horizontalMargin = 60.0;
+//        }
+        CGFloat horizontalMargin = HDiPhone6ScaleWidth(45.0);
         
         CGFloat containerViewW = (HDMainScreenWidth - horizontalMargin * 2);
         
@@ -701,6 +755,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     if (!_alertWindow) {
         _alertWindow = [[HDAlertWindow alloc] initWithFrame:HDMainScreenBounds andStyle:self.backgroundStyle];
         UITapGestureRecognizer *tapGes = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onAlertWindow)];
+        _alertWindow.rootViewController = [[HDAlertViewController alloc] initWithAllowRotation:self.isSupportRotating];
         [_alertWindow addGestureRecognizer:tapGes];
         _alertWindow.alpha = 0.01;
     }
@@ -939,6 +994,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     alertView.defaultButtonTitleColor = HDColorFromHex(0x0093ff);
     alertView.destructiveButtonTitleColor = HDColorFromHex(0xf74c31);
     alertView.buttonFont = [UIFont systemFontOfSize:17.0];
+    alertView.isSupportRotating = YES;
     
     if (!HDStringIsEmpty(cancelButtonTitle)) {
         [alertView addButtonWithTitle:cancelButtonTitle type:HDAlertViewButtonTypeCancel handler:^(HDAlertView *alertView) {
@@ -967,6 +1023,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 + (HDAlertView *)showActionSheetWithTitle:(NSString *)title {
     HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:nil];
+    alertView.isSupportRotating = YES;
     alertView.alertViewStyle = HDAlertViewStyleActionSheet;
     alertView.transitionStyle = HDAlertViewTransitionStyleSlideFromBottom;
     alertView.titleFont = [UIFont systemFontOfSize:13.0];

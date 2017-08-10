@@ -48,6 +48,9 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 
 @interface HDAlertView : UIView
 
+/** 是否支持旋转 */
+@property (nonatomic, assign) BOOL isSupportRotating;
+
 /** 图标的名字 */
 @property (nonatomic, copy) NSString *imageName;
 

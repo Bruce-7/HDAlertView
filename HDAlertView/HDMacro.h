@@ -97,6 +97,14 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 /******* 屏幕尺寸 *******/
 
 
+/******* 屏幕系数 *******/
+#define HDiPhone6WidthCoefficient(width) (width / 375.0)    // 以苹果6为准的系数
+#define HDiPhone6HeightCoefficient(height) (height / 667.0) // 以苹果6为准的系数
+#define HDiPhone6ScaleWidth(width) (HDiPhone6WidthCoefficient(width) * HDMainScreenWidth)     // 以苹果6为准的系数得到的宽
+#define HDiPhone6ScaleHeight(height) (HDiPhone6HeightCoefficient(height) * HDMainScreenHeight) // 以苹果6为准的系数得到的高
+/******* 屏幕系数 *******/
+
+
 /******* 设备型号和系统 *******/
 /** 检查系统版本 */
 #define HDSYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -152,11 +160,11 @@ dispatch_async(dispatch_get_main_queue(), block);   \
 
 #else
 
-//#define HDLog(...)  
-//#define HDLogError(frmt, ...)
-//#define HDLogWarn(frmt, ...)
-//#define HDLogInfo(frmt, ...)
-//#define HDLogDebug(frmt, ...)
+#define HDLog(...)
+#define HDLogError(frmt, ...)
+#define HDLogWarn(frmt, ...)
+#define HDLogInfo(frmt, ...)
+#define HDLogDebug(frmt, ...)
 
 #define HDAssert(...)
 #define HDParameterAssert(condition)
@@ -180,7 +188,7 @@ id value = [self valueForKey:key];                          \
 }                                                           \
 free(ivars);                                                \
 }                                                           \
-                                                            \
+\
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {         \
 if (self = [super init]) {                                  \
 unsigned int count = 0;                                     \
