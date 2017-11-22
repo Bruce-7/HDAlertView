@@ -73,4 +73,36 @@ typedef NS_ENUM(NSInteger, HDAnimationType) {
  */
 - (instancetype)hd_addAnimationAtPoint:(CGPoint)point WithDuration:(NSTimeInterval)duration WithType:(HDAnimationType) type withColor:(UIColor *)animationColor completion:(void (^)(BOOL finished))completion;
 
+
+#pragma UIView变成UIImage
+/**
+ 视图转成图片
+ 
+ @return 返回图片
+ */
+- (UIImage *)hd_convertViewToImage;
+
+/**
+ 视图裁剪成图片
+ 
+ @return 返回图片
+ */
+- (UIImage *)hd_snapsHotView;
+
+/**
+ 视图转成图片
+ 
+ @param view 视图
+ @return 返回图片
+ */
++ (UIImage *)hd_convertViewToImage:(UIView *)view;
+
+/**
+ 视图裁剪成图片
+ 
+ @param view 视图
+ @return 返回图片
+ */
++ (UIImage *)hd_snapsHotView:(UIView *)view;
+
 @end

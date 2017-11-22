@@ -288,7 +288,7 @@
 
 - (CGSize)hd_sizeWithSystemFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(NSLineBreakMode)mode numberOfLine:(NSInteger)numberOfLine {
     CGSize maxSize = [self hd_sizeWithSystemFont:font constrainedToSize:size lineBreakMode:mode];
-    CGFloat oneLineHeight = [self hd_sizeWithSystemFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat oneLineHeight = [self hd_sizeWithSystemFont:font constrainedToSize:CGSizeMake(size.width, font.lineHeight) lineBreakMode:NSLineBreakByTruncatingTail].height;
     CGFloat height = 0;
     CGFloat limitHeight = oneLineHeight * numberOfLine;
     
@@ -326,7 +326,7 @@
 
 - (CGSize)hd_sizeWithBoldFont:(UIFont *)font constrainedToSize:(CGSize)size lineBreakMode:(NSLineBreakMode)mode numberOfLine:(NSInteger)numberOfLine {
     CGSize maxSize = [self hd_sizeWithBoldFont:font constrainedToSize:size lineBreakMode:mode];
-    CGFloat oneLineHeight = [self hd_sizeWithBoldFont:font constrainedToSize:size lineBreakMode:NSLineBreakByTruncatingTail].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat oneLineHeight = [self hd_sizeWithBoldFont:font constrainedToSize:CGSizeMake(size.width, font.lineHeight) lineBreakMode:NSLineBreakByTruncatingTail].height;
     CGFloat height = 0;
     CGFloat limitHeight = oneLineHeight * numberOfLine;
     
@@ -375,7 +375,7 @@
 
 - (CGSize)hd_sizeWithAttributedStringLineSpeace:(CGFloat)lineSpeace kern:(CGFloat)kern font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment numberOfLine:(NSInteger)numberOfLine {
     CGSize maxSize = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:lineBreakMode alignment:alignment];
-    CGFloat oneLineHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height;
+    CGFloat oneLineHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:CGSizeMake(size.width, font.lineHeight) lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height;
     CGFloat height = 0;
     CGFloat limitHeight = oneLineHeight * numberOfLine;
     
@@ -389,7 +389,7 @@
 }
 
 - (BOOL)hd_numberOfLineWithLineSpeace:(CGFloat)lineSpeace kern:(CGFloat)kern font:(UIFont *)font size:(CGSize)size lineBreakMode:(NSLineBreakMode)lineBreakMode alignment:(NSTextAlignment)alignment {
-    CGFloat oneHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height; // 某些情况, 不到计算的一行主动换行了, NSLineBreakByTruncatingTail计算出来的不是真实一行, 这时候请使用你项目字体最大的高来计算 (控制参数size)
+    CGFloat oneHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:CGSizeMake(size.width, font.lineHeight) lineBreakMode:NSLineBreakByTruncatingTail alignment:alignment].height;
     CGFloat maxHeight = [self hd_sizeWithAttributedStringLineSpeace:lineSpeace kern:kern font:font size:size lineBreakMode:lineBreakMode alignment:alignment].height;
     
     if (maxHeight > oneHeight) {
@@ -476,8 +476,9 @@
 }
 
 
-NSString *const iPhone6_6s_7 = @"iPhone6_6s_7";
-NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
+NSString *const iPhone6_6s_7_8 = @"iPhone6_6s_7_8";
+NSString *const iPhone6_6s_7_8Plus = @"iPhone6_6s_7_8Plus";
+NSString *const iPhone_X = @"iPhone_X";
 
 + (instancetype)hd_deviceType {
     struct utsname systemInfo;
@@ -485,14 +486,20 @@ NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
     NSString *deviceString = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
     
     // iPhone
-    if ([deviceString isEqualToString:@"iPhone7,1"])    return iPhone6_6s_7Plus;
-    if ([deviceString isEqualToString:@"iPhone7,2"])    return iPhone6_6s_7;
-    if ([deviceString isEqualToString:@"iPhone8,1"])    return iPhone6_6s_7;
-    if ([deviceString isEqualToString:@"iPhone8,2"])    return iPhone6_6s_7Plus;
-    if ([deviceString isEqualToString:@"iPhone9,1"])    return iPhone6_6s_7;
-    if ([deviceString isEqualToString:@"iPhone9,2"])    return iPhone6_6s_7Plus;
-    if ([deviceString isEqualToString:@"iPhone9,3"])    return iPhone6_6s_7;
-    if ([deviceString isEqualToString:@"iPhone9,4"])    return iPhone6_6s_7Plus;
+    if ([deviceString isEqualToString:@"iPhone7,1"])    return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone7,2"])    return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone8,1"])    return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone8,2"])    return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone9,1"])    return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone9,2"])    return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone9,3"])    return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone9,4"])    return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone10,1"])   return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone10,4"])   return iPhone6_6s_7_8;
+    if ([deviceString isEqualToString:@"iPhone10,2"])   return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone10,5"])   return iPhone6_6s_7_8Plus;
+    if ([deviceString isEqualToString:@"iPhone10,3"])   return iPhone_X;
+    if ([deviceString isEqualToString:@"iPhone10,6"])   return iPhone_X;
     
     return deviceString;
 }
@@ -500,7 +507,7 @@ NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
 
 #pragma mark - 效验相关
 - (BOOL)hd_isValidEmail {
-    NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSString *emailRegex = @"((?<![0-9])([A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4})(?![0-9]))";
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
     
     return [emailTest evaluateWithObject:self];
@@ -514,7 +521,7 @@ NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
 }
 
 - (BOOL)hd_isValidUrl {
-    NSString *regex = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z0-9]{1,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#;$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^;&*+?:_/=<>]*)?)";
+    NSString *regex = @"((http[s]{0,1}|ftp)://[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#;$%^&*+?:_/=<>]*)?)|(www.[a-zA-Z0-9\\.\\-]+\\.([a-zA-Z]{2,4})(:\\d+)?(/[a-zA-Z0-9\\.\\-~!@#$%^;&*+?:_/=<>]*)?)";
     NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
     return [urlTest evaluateWithObject:self];
 }
@@ -525,49 +532,6 @@ NSString *const iPhone6_6s_7Plus = @"iPhone6_6s_7Plus";
     }
     
     return YES; // 现在新增手机号段很多_国际别的手机不一定11位_手机号其实没必要限制死!
-//    /**
-//     * 手机号码
-//     * 移动：134[0-8], 135, 136, 137, 138, 139, 150, 151, 157, 158, 159, 182, 187, 188
-//     * 联通：130, 131, 132, 152, 155, 156, 185, 186
-//     * 电信：133, 1349, 153, 180, 189
-//     */
-//    NSString * MOBILE = @"^1(3[0-9]|5[0-35-9]|8[0235-9])\\d{8}$";
-//    /**
-//     * 中国移动：China Mobile
-//     * 134[0-8], 135, 136, 137, 138, 139, 150, 151, 157, 158, 159, 182, 187, 188
-//     */
-//    NSString * CM = @"^1(34[0-8]|(3[5-9]|5[017-9]|8[278])\\d)\\d{7}$";
-//    /**
-//     * 中国联通：China Unicom
-//     * 130, 131, 132, 152, 155, 156, 185, 186
-//     */
-//    NSString * CU = @"^1(3[0-2]|5[256]|8[56])\\d{8}$";
-//    /**
-//     * 中国电信：China Telecom
-//     * 133, 1349, 153, 180, 189
-//     */
-//    NSString * CT = @"^1((33|53|7[678]|8[09])[0-9]|349)\\d{7}$";
-//    /**
-//     * 大陆地区固话及小灵通
-//     * 区号：010, 020, 021, 022, 023, 024, 025, 027, 028, 029
-//     * 号码：七位或八位
-//     */
-//    // NSString * PHS = @"^0(10|2[0-5789]|\\d{3})\\d{7,8}$";
-//    
-//    NSPredicate *regextestmobile = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", MOBILE];
-//    NSPredicate *regextestcm = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", CM];
-//    NSPredicate *regextestcu = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", CU];
-//    NSPredicate *regextestct = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", CT];
-//    
-//    if (([regextestmobile evaluateWithObject:self] == YES)
-//        || ([regextestcm evaluateWithObject:self] == YES)
-//        || ([regextestct evaluateWithObject:self] == YES)
-//        || ([regextestcu evaluateWithObject:self] == YES)) {
-//        
-//        return YES;
-//    } else {
-//        return NO;
-//    }
 }
 
 

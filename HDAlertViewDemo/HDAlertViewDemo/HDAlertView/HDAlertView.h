@@ -54,11 +54,11 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 /** 图标的名字 */
 @property (nonatomic, copy) NSString *imageName;
 
-/** 标题-只支持1行 */
-@property (nonatomic, copy) NSString *title;
-
-/** 消息描述-支持多行 */
+@property (nonatomic, copy) NSString *title; // ActionSheet模式最多2行
 @property (nonatomic, copy) NSString *message;
+@property (nonatomic, assign) NSTextAlignment titleTextAlignment;
+@property (nonatomic, assign) NSTextAlignment messageTextAlignment;
+
 
 @property (nonatomic, assign) HDAlertViewStyle alertViewStyle;              // 默认是HDAlertViewStyleAlert
 @property (nonatomic, assign) HDAlertViewTransitionStyle transitionStyle;   // 默认是 HDAlertViewTransitionStyleFade
@@ -70,15 +70,15 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 @property (nonatomic, copy) HDAlertViewHandler willDismissHandler;
 @property (nonatomic, copy) HDAlertViewHandler didDismissHandler;
 
-@property (nonatomic, strong) UIColor *viewBackgroundColor          UI_APPEARANCE_SELECTOR; // 默认是白色
-@property (nonatomic, strong) UIColor *titleColor                   UI_APPEARANCE_SELECTOR; // 默认是黑色
-@property (nonatomic, strong) UIColor *messageColor                 UI_APPEARANCE_SELECTOR; // 默认是灰色
-@property (nonatomic, strong) UIColor *defaultButtonTitleColor      UI_APPEARANCE_SELECTOR; // 默认是白色
-@property (nonatomic, strong) UIColor *cancelButtonTitleColor       UI_APPEARANCE_SELECTOR; // 默认是白色
-@property (nonatomic, strong) UIColor *destructiveButtonTitleColor  UI_APPEARANCE_SELECTOR; // 默认是白色
-@property (nonatomic, strong) UIFont *titleFont                     UI_APPEARANCE_SELECTOR; // 默认是18.0
-@property (nonatomic, strong) UIFont *messageFont                   UI_APPEARANCE_SELECTOR; // 默认是16.0
-@property (nonatomic, strong) UIFont *buttonFont                    UI_APPEARANCE_SELECTOR; // 默认是buttonFontSize
+@property (nonatomic, strong) UIColor *viewBackgroundColor          UI_APPEARANCE_SELECTOR; // 默认是clearColor
+@property (nonatomic, strong) UIColor *titleColor                   UI_APPEARANCE_SELECTOR; // 默认是blackColor
+@property (nonatomic, strong) UIColor *messageColor                 UI_APPEARANCE_SELECTOR; // 默认是darkGrayColor
+@property (nonatomic, strong) UIColor *defaultButtonTitleColor      UI_APPEARANCE_SELECTOR; // 默认是blueColor
+@property (nonatomic, strong) UIColor *cancelButtonTitleColor       UI_APPEARANCE_SELECTOR; // 默认是greenColor
+@property (nonatomic, strong) UIColor *destructiveButtonTitleColor  UI_APPEARANCE_SELECTOR; // 默认是redColor
+@property (nonatomic, strong) UIFont *titleFont                     UI_APPEARANCE_SELECTOR; // 默认是bold 18.0
+@property (nonatomic, strong) UIFont *messageFont                   UI_APPEARANCE_SELECTOR; // 默认是system 16.0
+@property (nonatomic, strong) UIFont *buttonFont                    UI_APPEARANCE_SELECTOR; // 默认是bold buttonFontSize
 @property (nonatomic, assign) CGFloat cornerRadius                  UI_APPEARANCE_SELECTOR; // 默认是10.0
 
 

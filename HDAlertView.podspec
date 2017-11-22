@@ -1,7 +1,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "HDAlertView"
-  s.version      = "2.1"
+  s.version      = "3.0"
   s.summary      = "A similar system alertView"
   s.homepage     = "https://github.com/Bruce-7/HDAlertView"
   s.license      = "MIT"

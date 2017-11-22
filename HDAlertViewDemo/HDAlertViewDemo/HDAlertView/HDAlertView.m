@@ -18,6 +18,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 
 
+
+
 #pragma mark - HDAlertItem
 @interface HDAlertItem : NSObject
 
@@ -34,6 +36,9 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 @implementation HDAlertItem
 
 @end
+
+
+
 
 
 #pragma mark - HDAlertViewController
@@ -73,6 +78,9 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 @end
 
 
+
+
+
 #pragma mark - HDAlertWindow
 @interface HDAlertWindow : UIWindow
 
@@ -88,7 +96,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     if (self = [super initWithFrame:frame]) {
         self.style = style;
         self.opaque = NO;
-        self.windowLevel = 1899.0; // 不重叠系统的Alert, Alert的层级.
+        self.windowLevel = UIWindowLevelAlert;
     }
     
     return self;
@@ -121,6 +129,8 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 }
 
 @end
+
+
 
 
 
@@ -174,7 +184,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 - (instancetype)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         self.frame = HDMainScreenBounds;
-        [self setUpSubviews];
+        [self createSubviews];
     }
     
     return self;
@@ -190,7 +200,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 - (void)statusBarOrientationChange:(NSNotification *)notification {
     self.frame = HDMainScreenBounds;
-    [self setSubviewsFrame];
+    [self updateSubviewsFrame];
 }
 
 + (instancetype)alertViewWithTitle:(NSString *)title andMessage:(NSString *)message {
@@ -225,21 +235,21 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         self.willShowHandler(weakSelf);
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:HDAlertViewWillShowNotification object:self userInfo:nil];
+    [HDNotificationCenter postNotificationName:HDAlertViewWillShowNotification object:self userInfo:nil];
     
     self.visible = YES;
     self.alertAnimating = YES;
     
-    [self setupButtons]; // 设置按钮
+    [self createButtons]; // 设置按钮
     [self.alertWindow.rootViewController.view addSubview:self];
     [self.alertWindow makeKeyAndVisible];
-    [self setSubviewsFrame]; // 布局
+    [self updateSubviewsFrame]; // 布局
     
     [self transitionInCompletion:^{
         if (weakSelf.didShowHandler) {
             weakSelf.didShowHandler(weakSelf);
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:HDAlertViewDidShowNotification object:weakSelf userInfo:nil];
+        [HDNotificationCenter postNotificationName:HDAlertViewDidShowNotification object:weakSelf userInfo:nil];
         
         weakSelf.alertAnimating = NO;
     }];
@@ -272,7 +282,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             self.willDismissHandler(weakSelf);
         }
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:HDAlertViewWillDismissNotification object:self userInfo:nil];
+        [HDNotificationCenter postNotificationName:HDAlertViewWillDismissNotification object:self userInfo:nil];
     }
     
     void (^dismissComplete)(void) = ^{
@@ -284,7 +294,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
                 weakSelf.didDismissHandler(weakSelf);
             }
             
-            [[NSNotificationCenter defaultCenter] postNotificationName:HDAlertViewDidDismissNotification object:weakSelf userInfo:nil];
+            [HDNotificationCenter postNotificationName:HDAlertViewDidDismissNotification object:weakSelf userInfo:nil];
         }
         
         [self removeView];
@@ -305,7 +315,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
  *  进入的动画
  */
 - (void)transitionInCompletion:(void(^)(void))completion {
-    CGFloat duration = 0.3;
+    CGFloat duration = 0.25;
     
     [UIView animateWithDuration:duration animations:^{
         self.alertWindow.alpha = 1.0;
@@ -391,7 +401,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
  *  消失的动画
  */
 - (void)transitionOutCompletion:(void(^)(void))completion {
-    CGFloat duration = 0.3;
+    CGFloat duration = 0.25;
     
     switch (self.transitionStyle) {
         case HDAlertViewTransitionStyleSlideFromBottom: {
@@ -469,7 +479,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 
 #pragma mark - 布局
-- (void)setSubviewsFrame {
+- (void)updateSubviewsFrame {
     if (self.alertViewStyle == HDAlertViewStyleActionSheet) {
         CGFloat containerViewW = HDMainScreenWidth;
         CGFloat margin = 25.0;
@@ -501,7 +511,6 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         }
         
         if (self.items.count > 0) {
-            UIColor *lineColor = [UIColor clearColor]; // 保留线避免设计移除毛玻璃效果好设置颜色
             NSUInteger btnCount = self.buttons.count;
             
             for (NSUInteger i = 0; i < btnCount; i++) {
@@ -509,10 +518,6 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
                     buttonY += buttonH + lineH;
                     lineY = buttonY;
                 }
-                
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
-                horizontalLine.backgroundColor = lineColor;
-                [self.containerView addSubview:horizontalLine];
                 
                 UIButton *button = self.buttons[i];
                 if (i == btnCount - 1) {
@@ -539,18 +544,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         
     } else {
         CGFloat margin = 25.0;
-        
-//        CGFloat horizontalMargin = 25.0;
-        // 真机才有效,模拟器统一是25.0 // 或者按设计比例来不用这种方式!
-//        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7]) {
-//            horizontalMargin = 45.0;
-//        }
-//        
-//        if ([[NSString hd_deviceType] isEqualToString:iPhone6_6s_7Plus]) {
-//            horizontalMargin = 60.0;
-//        }
-        CGFloat horizontalMargin = HDiPhone6ScaleWidth(45.0);
-        
+        CGFloat horizontalMargin = HDiPhone6ScaleWidth(45.0); // 按苹果6为标准做比例
         CGFloat containerViewW = (HDMainScreenWidth - horizontalMargin * 2);
         
         /** 图片 */
@@ -601,23 +595,13 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
         CGFloat buttonY = lineY + lineH;
         
         if (self.items.count > 0) {
-            UIColor *lineColor = [UIColor clearColor]; // 保留线避免设计移除毛玻璃效果好设置颜色
-            
             if (self.items.count == 2 && self.buttonsListStyle == HDAlertViewButtonsListStyleNormal) {
                 CGFloat buttonW = containerViewW * 0.5;
                 CGFloat buttonX = 0;
                 
-                UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
-                horizontalLine.backgroundColor = lineColor;
-                [self.containerView addSubview:horizontalLine];
-                
                 UIButton *button = self.buttons[0];
                 button.frame = CGRectMake(buttonX, buttonY, buttonW, buttonH);
-                
-                UIView *verticaleLine = [[UIView alloc] initWithFrame:CGRectMake(buttonW, buttonY, lineH, buttonH)];
-                verticaleLine.backgroundColor = lineColor;
-                [self.containerView addSubview:verticaleLine];
-                
+            
                 button = self.buttons[1];
                 button.frame = CGRectMake(buttonW + lineH, buttonY, buttonW - lineH, buttonH);
                 
@@ -627,10 +611,6 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
                         buttonY += buttonH + lineH;
                         lineY = buttonY;
                     }
-                    
-                    UIView *horizontalLine = [[UIView alloc] initWithFrame:CGRectMake(0, lineY, containerViewW, lineH)];
-                    horizontalLine.backgroundColor = lineColor;
-                    [self.containerView addSubview:horizontalLine];
                     
                     UIButton *button = self.buttons[i];
                     button.frame = CGRectMake(0, buttonY, containerViewW, buttonH);
@@ -657,7 +637,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 
 #pragma mark - 视图相关
-- (void)setUpSubviews {
+- (void)createSubviews {
     /** 容器视图 */
     UIView *containerView = [[UIView alloc] init];
     containerView.backgroundColor = [UIColor clearColor];
@@ -764,13 +744,15 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 }
 
 - (void)onAlertWindow {
-    [self dismissAnimated:YES];
+    if (self.alertViewStyle == HDAlertViewStyleActionSheet) {
+        [self dismissAnimated:YES];
+    }
 }
 
 /**
- *  设置按钮
+ *  创建按钮
  */
-- (void)setupButtons {
+- (void)createButtons {
     self.buttons = [[NSMutableArray alloc] initWithCapacity:self.items.count];
     
     for (NSUInteger i = 0; i < self.items.count; i++) {
@@ -817,7 +799,7 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 }
 
 - (void)removeView {
-    [UIView animateWithDuration:0.3 animations:^{
+    [UIView animateWithDuration:0.25 animations:^{
         self.alertWindow.alpha = 0.01;
     } completion:^(BOOL finished) {
         [self.alertWindow removeFromSuperview];
@@ -873,6 +855,16 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
     
     _message = message;
     self.messageLabel.text = message;
+}
+
+- (void)setTitleTextAlignment:(NSTextAlignment)titleTextAlignment {
+    _titleTextAlignment = titleTextAlignment;
+    self.titleLabel.textAlignment = titleTextAlignment;
+}
+
+- (void)setMessageTextAlignment:(NSTextAlignment)messageTextAlignment {
+    _messageTextAlignment = messageTextAlignment;
+    self.messageLabel.textAlignment = messageTextAlignment;
 }
 
 - (void)setViewBackgroundColor:(UIColor *)viewBackgroundColor {
@@ -1009,9 +1001,9 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
             if (block) {
                 if (!HDStringIsEmpty(cancelButtonTitle)) {
                     block(alertView, i + 1);
+                } else {
+                    block(alertView, i);
                 }
-                
-                block(alertView, i);
             }
         }];
     }

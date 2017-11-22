@@ -32,7 +32,7 @@
  *  返回一个缩放好的图片
  *
  *  @param image  要切割的图片
- *  @param 需要切割成的大小 边框的宽度
+ *  @param imageSize 边框的宽度
  *
  *  @return 切割好的图片
  */
@@ -42,7 +42,6 @@
  *  返回一个下边有半个红圈的原型头像
  *
  *  @param image  要切割的图片
- *  @param border 边框的宽度
  *
  *  @return 切割好的头像
  */
@@ -126,7 +125,17 @@
  *
  *  @return 压缩好的图片
  */
-+ (instancetype)hd_imageWithImageSimple:(UIImage*)image scaledToSize:(CGSize)newSize;
++ (instancetype)hd_imageWithImageSimple:(UIImage *)image scaledToSize:(CGSize)newSize;
+
+/**
+ *  对图片进行压缩
+ *
+ *  @param image   要压缩的图片
+ *  @param newSize 压缩后的图片的像素尺寸
+ *
+ *  @return 压缩好的图片
+ */
++ (instancetype)hd_imageWithDataSimple:(NSData *)imageData scaledToSize:(CGSize)newSize;
 
 /**
  *  生成了一个毛玻璃效果的图片

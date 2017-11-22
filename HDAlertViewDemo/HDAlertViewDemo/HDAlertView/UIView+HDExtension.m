@@ -265,4 +265,34 @@
     return radius * 2.0;
 }
 
+
+#pragma UIView变成UIImage
+#pragma UIView变成UIImage
++ (UIImage *)hd_convertViewToImage:(UIView *)view {
+    // 第二个参数表示是否非透明。如果需要显示半透明效果，需传NO，否则YES。第三个参数就是屏幕密度了
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, [UIScreen mainScreen].scale);
+    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
++ (UIImage *)hd_snapsHotView:(UIView *)view {
+    UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, [UIScreen mainScreen].scale);
+    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:NO];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
+- (UIImage *)hd_convertViewToImage {
+    return [UIView hd_convertViewToImage:self];
+}
+
+- (UIImage *)hd_snapsHotView {
+    return [UIView hd_snapsHotView:self];
+}
+
 @end

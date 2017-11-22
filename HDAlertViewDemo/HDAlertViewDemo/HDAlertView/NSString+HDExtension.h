@@ -431,8 +431,9 @@
 /**
  *  设备类型(用于区分iPhone屏幕大小)
  */
-HD_EXTERN NSString *const iPhone6_6s_7;
-HD_EXTERN NSString *const iPhone6_6s_7Plus;
+HD_EXTERN NSString *const iPhone6_6s_7_8;
+HD_EXTERN NSString *const iPhone6_6s_7_8Plus;
+HD_EXTERN NSString *const iPhone_X;
 + (instancetype)hd_deviceType;
 
 
