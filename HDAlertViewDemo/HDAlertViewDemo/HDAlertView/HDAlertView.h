@@ -135,6 +135,20 @@ typedef void(^HDAlertViewHandler)(HDAlertView *alertView);
 + (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block;
 
 /**
+ 快速弹窗
+ 
+ @param title 标题
+ @param message 消息体
+ @param cancelButtonTitle 取消按钮文字
+ @param otherButtonTitles 其他按钮
+
+ @param buttonsListStyle 按钮排列方式
+ @param block 回调
+ @return 返回HDAlertView对象
+ */
++ (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles buttonsListStyle:(HDAlertViewButtonsListStyle)buttonsListStyle handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block;
+
+/**
  ActionSheet样式弹窗
  
  @param title 标题

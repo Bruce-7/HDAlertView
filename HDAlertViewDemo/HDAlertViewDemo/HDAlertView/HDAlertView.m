@@ -980,13 +980,19 @@ NSString *const HDAlertViewDidDismissNotification   = @"HDAlertViewDidDismissNot
 
 #pragma mark - 类方法
 + (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block {
-    
+    return [HDAlertView showAlertViewWithTitle:title message:message cancelButtonTitle:cancelButtonTitle otherButtonTitles:otherButtonTitles buttonsListStyle:HDAlertViewButtonsListStyleNormal handler:block];;
+}
+
++ (HDAlertView *)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButtonTitle:(NSString *)cancelButtonTitle otherButtonTitles:(NSArray<NSString *> *)otherButtonTitles buttonsListStyle:(HDAlertViewButtonsListStyle)buttonsListStyle handler:(void (^)(HDAlertView *alertView, NSInteger buttonIndex))block {
     HDAlertView *alertView = [[HDAlertView alloc] initWithTitle:title andMessage:message];
     alertView.cancelButtonTitleColor = [UIColor blackColor];
     alertView.defaultButtonTitleColor = HDColorFromHex(0x0093ff);
     alertView.destructiveButtonTitleColor = HDColorFromHex(0xf74c31);
     alertView.buttonFont = [UIFont systemFontOfSize:17.0];
     alertView.isSupportRotating = YES;
+    if (buttonsListStyle) {
+        alertView.buttonsListStyle = buttonsListStyle;
+    }
     
     if (!HDStringIsEmpty(cancelButtonTitle)) {
         [alertView addButtonWithTitle:cancelButtonTitle type:HDAlertViewButtonTypeCancel handler:^(HDAlertView *alertView) {
